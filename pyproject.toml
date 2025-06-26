@@ -1,0 +1,40 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "mcp-pyrefly"
+version = "0.1.0"
+description = "MCP server for real-time Python code validation using Pyrefly to prevent LLM coding errors"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [{name = "Kim Asplund", email = "kim.asplund@gmail.com"}]
+requires-python = ">=3.10"
+dependencies = [
+    "mcp>=1.9.4",
+    "pyrefly>=0.21.0",
+    "pydantic>=2.7.2",
+    "anyio>=4.5",
+]
+keywords = ["mcp", "pyrefly", "code-validation", "llm", "type-checking"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+
+[project.scripts]
+mcp-pyrefly = "mcp_pyrefly.server:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/mcp_pyrefly"]
+
+[project.urls]
+Homepage = "https://github.com/kimasplund/mcp-pyrefly"
+Repository = "https://github.com/kimasplund/mcp-pyrefly"
+Issues = "https://github.com/kimasplund/mcp-pyrefly/issues"
