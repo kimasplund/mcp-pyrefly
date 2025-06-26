@@ -1,15 +1,15 @@
 """MCP Server for Pyrefly code validation."""
 
 import logging
-from typing import Dict, List, Optional, Any
 from datetime import datetime, timedelta
+from typing import Any
 
-from mcp.server.fastmcp import FastMCP, Context
+from mcp.server.fastmcp import Context, FastMCP
 from pydantic import BaseModel, Field
 
-from .session_tracker import SessionTracker
-from .pyrefly_integration import PyreflyChecker
 from .gamification import InfiniteCarrotSystem
+from .pyrefly_integration import PyreflyChecker
+from .session_tracker import SessionTracker
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -28,8 +28,8 @@ class CodeCheckRequest(BaseModel):
     """Request model for code checking."""
 
     code: str = Field(..., description="Python code to check")
-    filename: Optional[str] = Field(None, description="Optional filename for context")
-    context_files: Optional[Dict[str, str]] = Field(
+    filename: str | None = Field(None, description="Optional filename for context")
+    context_files: dict[str, str] | None = Field(
         None, description="Additional files for multi-file checking"
     )
     track_identifiers: bool = Field(
@@ -41,16 +41,16 @@ class CodeCheckResponse(BaseModel):
     """Response model for code checking."""
 
     success: bool = Field(..., description="Whether the code passed all checks")
-    errors: List[Dict[str, Any]] = Field(
+    errors: list[dict[str, Any]] = Field(
         default_factory=list, description="List of errors found"
     )
-    warnings: List[Dict[str, Any]] = Field(
+    warnings: list[dict[str, Any]] = Field(
         default_factory=list, description="List of warnings found"
     )
-    consistency_issues: List[Dict[str, Any]] = Field(
+    consistency_issues: list[dict[str, Any]] = Field(
         default_factory=list, description="Naming consistency issues"
     )
-    suggestions: List[str] = Field(
+    suggestions: list[str] = Field(
         default_factory=list, description="Suggestions for fixes"
     )
 
@@ -62,10 +62,8 @@ class IdentifierTrackRequest(BaseModel):
     type: str = Field(
         ..., description="Type: function, variable, class, method, constant"
     )
-    signature: Optional[str] = Field(None, description="Function/method signature")
-    file_path: Optional[str] = Field(
-        None, description="File where identifier is defined"
-    )
+    signature: str | None = Field(None, description="Function/method signature")
+    file_path: str | None = Field(None, description="File where identifier is defined")
 
 
 class ConsistencyCheckRequest(BaseModel):
@@ -212,7 +210,7 @@ async def check_code(request: CodeCheckRequest, context: Context) -> CodeCheckRe
 @mcp.tool()
 async def track_identifier(
     request: IdentifierTrackRequest, context: Context
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Explicitly track an identifier for consistency checking.
 
@@ -237,7 +235,7 @@ async def track_identifier(
 @mcp.tool()
 async def check_consistency(
     request: ConsistencyCheckRequest, context: Context
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Check if an identifier name is consistent with existing naming patterns.
 
@@ -276,8 +274,8 @@ async def check_consistency(
 
 @mcp.tool()
 async def list_identifiers(
-    type_filter: Optional[str] = None, context: Optional[Context] = None
-) -> Dict[str, Any]:
+    type_filter: str | None = None, context: Context | None = None
+) -> dict[str, Any]:
     """
     List all tracked identifiers in the current session.
 
@@ -305,9 +303,9 @@ async def list_identifiers(
 @mcp.tool()
 async def suggest_fix(
     error_message: str,
-    code_context: Optional[str] = None,
-    context: Optional[Context] = None,
-) -> Dict[str, Any]:
+    code_context: str | None = None,
+    context: Context | None = None,
+) -> dict[str, Any]:
     """
     Suggest fixes for common Python errors based on error messages.
 
@@ -394,9 +392,9 @@ async def suggest_fix(
 async def submit_fixed_code(
     original_code: str,
     fixed_code: str,
-    errors_fixed: List[str],
-    context: Optional[Context] = None,
-) -> Dict[str, Any]:
+    errors_fixed: list[str],
+    context: Context | None = None,
+) -> dict[str, Any]:
     """
     Submit fixed code to earn lollipops! 🍭
 
@@ -488,7 +486,7 @@ async def submit_fixed_code(
 
 
 @mcp.tool()
-async def check_lollipop_status(context: Optional[Context] = None) -> Dict[str, Any]:
+async def check_lollipop_status(context: Context | None = None) -> dict[str, Any]:
     """
     Check your lollipop collection and leaderboard position!
 
@@ -572,7 +570,7 @@ async def check_lollipop_status(context: Optional[Context] = None) -> Dict[str, 
 
 
 @mcp.tool()
-async def clear_session(context: Optional[Context] = None) -> Dict[str, str]:
+async def clear_session(context: Context | None = None) -> dict[str, str]:
     """
     Clear all tracked identifiers and start fresh.
 

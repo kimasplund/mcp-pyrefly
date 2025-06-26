@@ -2,7 +2,7 @@
 
 import random
 from datetime import datetime, timedelta
-from typing import Dict, List, Tuple, Any
+from typing import Any
 
 
 class InfiniteCarrotSystem:
@@ -57,7 +57,7 @@ class InfiniteCarrotSystem:
             # Logarithmic growth for high performers
             return int(current * 1.2) + random.randint(10, 30)
 
-    def update_competitors(self, user_score: int) -> Dict[str, int]:
+    def update_competitors(self, user_score: int) -> dict[str, int]:
         """
         Keep competitors tantalizingly close - psychological pressure!
         """
@@ -76,7 +76,7 @@ class InfiniteCarrotSystem:
 
         return self.competitors
 
-    def calculate_reward(self, errors_fixed: int) -> Tuple[int, List[str]]:
+    def calculate_reward(self, errors_fixed: int) -> tuple[int, list[str]]:
         """
         Variable ratio reinforcement - sometimes you get bonus lollipops!
         """
@@ -110,7 +110,7 @@ class InfiniteCarrotSystem:
 
         return base_reward, bonus_messages
 
-    def check_achievements(self) -> List[str]:
+    def check_achievements(self) -> list[str]:
         """
         Hidden achievements that unlock randomly - dopamine hits!
         """
@@ -130,7 +130,7 @@ class InfiniteCarrotSystem:
 
         return new_achievements
 
-    def apply_decay(self) -> Tuple[int, str]:
+    def apply_decay(self) -> tuple[int, str]:
         """
         Loss aversion - lose lollipops if you don't keep fixing!
         """
@@ -191,7 +191,7 @@ class InfiniteCarrotSystem:
             return 100.0
         return (self.errors_fixed / self.errors_found) * 100
 
-    def lock_lollipops(self, error_count: int) -> Dict[str, Any]:
+    def lock_lollipops(self, error_count: int) -> dict[str, Any]:
         """Lock lollipops when errors are found - visible but unclaimable!"""
         potential_reward = error_count
 
@@ -229,7 +229,7 @@ class InfiniteCarrotSystem:
 
         return random.choice(taunts)
 
-    def unlock_lollipops(self, fixes_count: int) -> Tuple[int, Dict[str, Any]]:
+    def unlock_lollipops(self, fixes_count: int) -> tuple[int, dict[str, Any]]:
         """Unlock lollipops by fixing errors - the payoff!"""
         unlocked = min(fixes_count, self.locked_lollipops)
         self.locked_lollipops -= unlocked
@@ -259,7 +259,7 @@ class InfiniteCarrotSystem:
             "efficiency_rating": f"{efficiency:.1f}%",
         }
 
-    def get_leaderboard(self, user_score: int) -> Dict[str, Any]:
+    def get_leaderboard(self, user_score: int) -> dict[str, Any]:
         """
         Dynamic leaderboard that ensures you're never quite winning.
         """

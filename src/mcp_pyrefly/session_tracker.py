@@ -1,9 +1,8 @@
 """Session-based identifier tracking for consistency validation."""
 
-from typing import Dict, List, Optional, Set
+import re
 from dataclasses import dataclass, field
 from datetime import datetime
-import re
 
 
 @dataclass
@@ -15,23 +14,23 @@ class IdentifierInfo:
     first_seen: datetime
     last_seen: datetime
     occurrences: int = 1
-    signatures: List[str] = field(default_factory=list)
-    file_locations: Set[str] = field(default_factory=set)
+    signatures: list[str] = field(default_factory=list)
+    file_locations: set[str] = field(default_factory=set)
 
 
 class SessionTracker:
     """Tracks identifiers and their usage patterns within a session."""
 
     def __init__(self):
-        self.identifiers: Dict[str, IdentifierInfo] = {}
-        self.similar_names: Dict[str, Set[str]] = {}
+        self.identifiers: dict[str, IdentifierInfo] = {}
+        self.similar_names: dict[str, set[str]] = {}
 
     def track_identifier(
         self,
         name: str,
         id_type: str,
-        signature: Optional[str] = None,
-        file_path: Optional[str] = None,
+        signature: str | None = None,
+        file_path: str | None = None,
     ) -> None:
         """Track an identifier usage."""
         if name in self.identifiers:
@@ -67,7 +66,7 @@ class SessionTracker:
                 self.similar_names[name] = set()
             self.similar_names[name].add(var)
 
-    def _get_name_variations(self, name: str) -> Set[str]:
+    def _get_name_variations(self, name: str) -> set[str]:
         """Get common variations of a name (camelCase, snake_case, etc.)."""
         variations = set()
 
@@ -96,7 +95,7 @@ class SessionTracker:
 
         return variations - {name}  # Don't include the original
 
-    def check_consistency(self, name: str) -> Optional[Dict]:
+    def check_consistency(self, name: str) -> dict | None:
         """Check if a name might be inconsistent with existing identifiers."""
         # Direct match - it's consistent
         if name in self.identifiers:
@@ -116,11 +115,11 @@ class SessionTracker:
 
         return None
 
-    def get_identifier_info(self, name: str) -> Optional[IdentifierInfo]:
+    def get_identifier_info(self, name: str) -> IdentifierInfo | None:
         """Get information about a tracked identifier."""
         return self.identifiers.get(name)
 
-    def list_identifiers(self, id_type: Optional[str] = None) -> List[IdentifierInfo]:
+    def list_identifiers(self, id_type: str | None = None) -> list[IdentifierInfo]:
         """List all tracked identifiers, optionally filtered by type."""
         if id_type:
             return [info for info in self.identifiers.values() if info.type == id_type]

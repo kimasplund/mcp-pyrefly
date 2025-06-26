@@ -1,11 +1,11 @@
 """Integration with Pyrefly type checker."""
 
+import logging
+import os
 import subprocess
 import tempfile
-import os
-from typing import Dict, List, Optional, Any
 from pathlib import Path
-import logging
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +18,7 @@ class PyreflyChecker:
         if not self.pyrefly_path:
             raise RuntimeError("Pyrefly not found in PATH or virtual environment")
 
-    def _find_pyrefly(self) -> Optional[str]:
+    def _find_pyrefly(self) -> str | None:
         """Find the pyrefly executable."""
         # Try to find in PATH first
         result = subprocess.run(["which", "pyrefly"], capture_output=True, text=True)
@@ -42,9 +42,9 @@ class PyreflyChecker:
     def check_code(
         self,
         code: str,
-        filename: Optional[str] = None,
-        context: Optional[Dict[str, str]] = None,
-    ) -> Dict[str, Any]:
+        filename: str | None = None,
+        context: dict[str, str] | None = None,
+    ) -> dict[str, Any]:
         """
         Check Python code using Pyrefly.
 
@@ -80,7 +80,7 @@ class PyreflyChecker:
 
     def _parse_output(
         self, result: subprocess.CompletedProcess, filepath: str
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Parse Pyrefly output into structured format."""
         errors = []
         warnings = []
@@ -176,7 +176,7 @@ class PyreflyChecker:
             "raw_stderr": result.stderr,
         }
 
-    def _parse_text_line(self, line: str) -> Dict[str, Any]:
+    def _parse_text_line(self, line: str) -> dict[str, Any]:
         """Parse a text error/warning line."""
         # Try to extract line/column info
         import re
@@ -198,7 +198,7 @@ class PyreflyChecker:
             "severity": "error" if "error" in line.lower() else "warning",
         }
 
-    def extract_identifiers(self, code: str) -> List[Dict[str, str]]:
+    def extract_identifiers(self, code: str) -> list[dict[str, str]]:
         """Extract function, class, and variable definitions from code."""
         identifiers = []
 

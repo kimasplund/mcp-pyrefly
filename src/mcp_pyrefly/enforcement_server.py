@@ -1,17 +1,18 @@
 """Enhanced MCP Server with enforcement mechanisms to force fixes."""
 
-from typing import Dict, Optional, Any
 from datetime import datetime
+from typing import Any
+
+from mcp.server.fastmcp import Context, FastMCP
 from pydantic import BaseModel
 
-from mcp.server.fastmcp import FastMCP, Context
 from .pyrefly_integration import PyreflyChecker
 
 # Enhanced server with enforcement
 enforcement_mcp = FastMCP("mcp-pyrefly-enforcer")
 
 # Track blocked sessions
-blocked_sessions: Dict[str, Dict[str, Any]] = {}
+blocked_sessions: dict[str, dict[str, Any]] = {}
 
 
 class BlockedState(BaseModel):
@@ -29,9 +30,9 @@ class BlockedState(BaseModel):
 async def check_code_enforced(
     code: str,
     filename: str,
-    session_id: Optional[str] = None,
-    context: Optional[Context] = None,
-) -> Dict[str, Any]:
+    session_id: str | None = None,
+    context: Context | None = None,
+) -> dict[str, Any]:
     """
     Check code with enforcement - blocks progress until fixes are made.
     """
@@ -86,8 +87,8 @@ async def submit_fixes(
     session_id: str,
     fixed_code: str,
     fix_explanation: str,
-    context: Optional[Context] = None,
-) -> Dict[str, Any]:
+    context: Context | None = None,
+) -> dict[str, Any]:
     """
     Submit fixes for a blocked session. Must explain what was fixed and why.
     """
@@ -127,7 +128,7 @@ async def submit_fixes(
 
 
 @enforcement_mcp.tool()
-async def get_blocked_sessions(context: Optional[Context] = None) -> Dict[str, Any]:
+async def get_blocked_sessions(context: Context | None = None) -> dict[str, Any]:
     """
     List all currently blocked sessions that need fixes.
     """
@@ -156,7 +157,7 @@ async def get_blocked_sessions(context: Optional[Context] = None) -> Dict[str, A
 
 # Add a meta-tool that demonstrates the enforcement pattern
 @enforcement_mcp.tool()
-async def demonstrate_enforcement(context: Optional[Context] = None) -> Dict[str, Any]:
+async def demonstrate_enforcement(context: Context | None = None) -> dict[str, Any]:
     """
     Demonstrates how the enforcement pattern works.
     """
