@@ -2,10 +2,9 @@
 
 from typing import Dict, Optional, Any
 from datetime import datetime
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 from mcp.server.fastmcp import FastMCP, Context
-from .session_tracker import SessionTracker
 from .pyrefly_integration import PyreflyChecker
 
 # Enhanced server with enforcement

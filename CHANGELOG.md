@@ -42,10 +42,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Full API documentation for all tools
 
 #### 🔧 Infrastructure
-- GitHub Actions workflows for CI/CD with matrix testing across Python 3.8-3.13
+- GitHub Actions workflows for CI/CD with matrix testing across Python 3.10-3.13
 - Automated publishing to PyPI using Trusted Publishing (no API keys!)
 - Multi-platform testing (Linux, macOS, Windows)
-- Python 3.8-3.13 compatibility matrix
+- Python 3.10-3.13 compatibility (3.8-3.9 dropped as they're EOL/near-EOL)
 - Security scanning and dependency auditing
 - Version bumping script with proper type annotations
 - Basic test suite with pytest

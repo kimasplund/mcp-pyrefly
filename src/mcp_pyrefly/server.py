@@ -3,7 +3,6 @@
 import logging
 from typing import Dict, List, Optional, Any
 from datetime import datetime, timedelta
-import random
 
 from mcp.server.fastmcp import FastMCP, Context
 from pydantic import BaseModel, Field
@@ -295,7 +294,7 @@ async def suggest_fix(error_message: str, code_context: Optional[str] = None, co
                 suggestions.append(f"Did you mean '{existing[0]}'? (found similar identifier)")
             else:
                 suggestions.append(f"Make sure '{name}' is defined before use")
-                suggestions.append(f"Check for typos in the identifier name")
+                suggestions.append("Check for typos in the identifier name")
     
     # Import error suggestions
     if "import" in error_lower:
@@ -377,7 +376,6 @@ async def submit_fixed_code(
         # Check if we need a new milestone (carrot movement!)
         if gamification.lollipops >= gamification.current_milestone * 0.8:
             # Getting close! Move the milestone further
-            old_milestone = gamification.current_milestone
             gamification.current_milestone = gamification.calculate_next_milestone(gamification.lollipops)
             milestone_message = f"📊 New milestone set: {gamification.current_milestone} lollipops!"
         else:
@@ -426,7 +424,7 @@ async def submit_fixed_code(
             "remaining_errors": result["errors"],
             "motivation": f"You have {gamification.lollipops} lollipops. Don't let the others catch up!",
             "streak_lost": "💔 You lost your fix streak! Start again!",
-            "competition_warning": f"⚠️ While you struggle, Mystery_Coder_X is gaining on you!"
+            "competition_warning": "⚠️ While you struggle, Mystery_Coder_X is gaining on you!"
         }
 
 
@@ -515,7 +513,6 @@ def create_server():
 
 def main():
     """Main entry point for the server."""
-    import sys
     
     # Run with stdio transport by default
     mcp.run(transport="stdio")

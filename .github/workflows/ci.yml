@@ -43,13 +43,8 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12', '3.13']
-        exclude:
-          # Exclude some combinations to save CI time
-          - os: windows-latest
-            python-version: '3.8'
-          - os: windows-latest
-            python-version: '3.9'
+        python-version: ['3.10', '3.11', '3.12', '3.13']
+        # No exclusions needed since we only support 3.10+
     
     steps:
     - uses: actions/checkout@v4
@@ -93,8 +88,11 @@ jobs:
     
     - name: Test Pyrefly binary
       run: |
-        pyrefly --version
-        echo "def test(): pass" | pyrefly -
+        # Test that pyrefly is installed
+        which pyrefly
+        # Test with a simple Python file
+        echo "def test() -> None: pass" > test_pyrefly.py
+        pyrefly check test_pyrefly.py
     
     - name: Test MCP server startup
       run: |
