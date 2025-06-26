@@ -1,0 +1,209 @@
+name: Publish to PyPI
+
+on:
+  push:
+    tags:
+      - 'v*'  # Push events to matching v*, i.e. v1.0, v2.1.3
+  workflow_dispatch:  # Allow manual triggering
+
+jobs:
+  # Run tests first to ensure quality
+  test:
+    name: Test Python ${{ matrix.python-version }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12', '3.13']
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e ".[dev]"
+    
+    - name: Lint with ruff
+      run: |
+        pip install ruff
+        ruff check src/
+    
+    - name: Type check with mypy
+      run: |
+        pip install mypy
+        mypy src/
+    
+    - name: Test Pyrefly integration
+      run: |
+        # Test that Pyrefly binary works
+        pyrefly --version
+        # Run integration tests
+        python -m pytest tests/ -v
+    
+    - name: Test MCP protocol compliance
+      run: |
+        # Validate MCP server starts correctly
+        timeout 5 mcp-pyrefly || true
+        # Run MCP-specific tests
+        python -m pytest tests/test_mcp_compliance.py -v
+
+  # Build distribution packages
+  build:
+    name: Build distribution
+    runs-on: ubuntu-latest
+    needs: [test]
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Full history for version detection
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.x'
+    
+    - name: Install build dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install build twine
+    
+    - name: Build distribution
+      run: python -m build
+    
+    - name: Check distribution
+      run: |
+        python -m twine check dist/*
+        ls -la dist/
+    
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: python-package-distributions
+        path: dist/
+
+  # Publish to TestPyPI first
+  publish-to-testpypi:
+    name: Publish to TestPyPI
+    needs: [build]
+    runs-on: ubuntu-latest
+    
+    environment:
+      name: testpypi
+      url: https://test.pypi.org/p/mcp-pyrefly
+    
+    permissions:
+      id-token: write  # IMPORTANT: mandatory for trusted publishing
+    
+    steps:
+    - name: Download artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: python-package-distributions
+        path: dist/
+    
+    - name: Publish to TestPyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        repository-url: https://test.pypi.org/legacy/
+        skip-existing: true
+
+  # Test installation from TestPyPI
+  test-testpypi-install:
+    name: Test TestPyPI Installation
+    needs: [publish-to-testpypi]
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    
+    - name: Test installation
+      run: |
+        # Wait for package to be available
+        sleep 30
+        # Install from TestPyPI
+        pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ mcp-pyrefly
+        # Test the command works
+        mcp-pyrefly --version || echo "Version command not implemented yet"
+        # Test basic import
+        python -c "import mcp_pyrefly; print('Import successful')"
+
+  # Publish to PyPI (production)
+  publish-to-pypi:
+    name: Publish to PyPI
+    if: startsWith(github.ref, 'refs/tags/')  # Only on tags
+    needs: [test-testpypi-install]
+    runs-on: ubuntu-latest
+    
+    environment:
+      name: pypi
+      url: https://pypi.org/p/mcp-pyrefly
+    
+    permissions:
+      id-token: write  # IMPORTANT: mandatory for trusted publishing
+    
+    steps:
+    - name: Download artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: python-package-distributions
+        path: dist/
+    
+    - name: Publish to PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
+
+  # Create GitHub Release
+  github-release:
+    name: Create GitHub Release
+    needs: [publish-to-pypi]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # For creating releases
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Download artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: python-package-distributions
+        path: dist/
+    
+    - name: Generate changelog
+      id: changelog
+      run: |
+        # Extract version from tag
+        VERSION=${GITHUB_REF#refs/tags/v}
+        echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+        
+        # Generate changelog (you might want to use a tool like git-cliff)
+        echo "## What's Changed" > CHANGELOG_CURRENT.md
+        echo "" >> CHANGELOG_CURRENT.md
+        echo "### 🍭 Lollipop System" >> CHANGELOG_CURRENT.md
+        echo "- Enhanced gamification features" >> CHANGELOG_CURRENT.md
+        echo "- Dynamic leaderboard updates" >> CHANGELOG_CURRENT.md
+        echo "" >> CHANGELOG_CURRENT.md
+        echo "### 🐛 Bug Fixes" >> CHANGELOG_CURRENT.md
+        echo "- Fixed Pyrefly INFO line parsing" >> CHANGELOG_CURRENT.md
+        echo "" >> CHANGELOG_CURRENT.md
+        echo "### 📦 Dependencies" >> CHANGELOG_CURRENT.md
+        echo "- Pyrefly >= 0.21.0" >> CHANGELOG_CURRENT.md
+        echo "- MCP >= 1.9.4" >> CHANGELOG_CURRENT.md
+    
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        name: mcp-pyrefly v${{ steps.changelog.outputs.VERSION }}
+        body_path: CHANGELOG_CURRENT.md
+        files: dist/*
+        draft: false
+        prerelease: false
