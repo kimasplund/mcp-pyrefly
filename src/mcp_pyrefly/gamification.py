@@ -11,7 +11,7 @@ class InfiniteCarrotSystem:
     Uses dynamic milestones, fictional competitors, and variable rewards.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.lollipops = 0
         self.locked_lollipops = 0  # Visible but unclaimable rewards
         self.error_debt = 0  # Unfixed errors accumulate here

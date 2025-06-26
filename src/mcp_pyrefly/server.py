@@ -580,12 +580,12 @@ async def clear_session(context: Context | None = None) -> dict[str, str]:
     return {"status": "cleared", "message": "Session tracking has been reset"}
 
 
-def create_server():
+def create_server() -> FastMCP:
     """Create and return the MCP server instance."""
     return mcp
 
 
-def main():
+def main() -> None:
     """Main entry point for the server."""
 
     # Run with stdio transport by default

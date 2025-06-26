@@ -3,6 +3,7 @@
 import re
 from dataclasses import dataclass, field
 from datetime import datetime
+from typing import Any
 
 
 @dataclass
@@ -21,7 +22,7 @@ class IdentifierInfo:
 class SessionTracker:
     """Tracks identifiers and their usage patterns within a session."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.identifiers: dict[str, IdentifierInfo] = {}
         self.similar_names: dict[str, set[str]] = {}
 
@@ -95,7 +96,7 @@ class SessionTracker:
 
         return variations - {name}  # Don't include the original
 
-    def check_consistency(self, name: str) -> dict | None:
+    def check_consistency(self, name: str) -> dict[str, Any] | None:
         """Check if a name might be inconsistent with existing identifiers."""
         # Direct match - it's consistent
         if name in self.identifiers:

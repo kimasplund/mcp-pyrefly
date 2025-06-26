@@ -21,9 +21,9 @@ class BlockedState(BaseModel):
     session_id: str
     timestamp: datetime
     original_code: str
-    errors: list
-    required_fixes: list
-    fix_instructions: list
+    errors: list[Any]
+    required_fixes: list[Any]
+    fix_instructions: list[Any]
 
 
 @enforcement_mcp.tool()

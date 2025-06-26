@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 class PyreflyChecker:
     """Wrapper for Pyrefly type checking functionality."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.pyrefly_path = self._find_pyrefly()
         if not self.pyrefly_path:
             raise RuntimeError("Pyrefly not found in PATH or virtual environment")
@@ -69,6 +69,8 @@ class PyreflyChecker:
                     context_file.write_text(content, encoding="utf-8")
 
             # Run Pyrefly
+            if not self.pyrefly_path:
+                raise RuntimeError("Pyrefly path not set")
             result = subprocess.run(
                 [self.pyrefly_path, "check", str(main_file)],
                 capture_output=True,
@@ -79,7 +81,7 @@ class PyreflyChecker:
             return self._parse_output(result, str(main_file))
 
     def _parse_output(
-        self, result: subprocess.CompletedProcess, filepath: str
+        self, result: subprocess.CompletedProcess[str], filepath: str
     ) -> dict[str, Any]:
         """Parse Pyrefly output into structured format."""
         errors = []
@@ -198,7 +200,7 @@ class PyreflyChecker:
             "severity": "error" if "error" in line.lower() else "warning",
         }
 
-    def extract_identifiers(self, code: str) -> list[dict[str, str]]:
+    def extract_identifiers(self, code: str) -> list[dict[str, Any]]:
         """Extract function, class, and variable definitions from code."""
         identifiers = []
 
