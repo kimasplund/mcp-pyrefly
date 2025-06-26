@@ -18,7 +18,7 @@ def test_import():
     from mcp_pyrefly import create_server
     from mcp_pyrefly.session_tracker import SessionTracker
     from mcp_pyrefly.pyrefly_integration import PyreflyChecker
-    
+
     # Basic sanity checks
     assert callable(create_server)
     assert SessionTracker is not None
@@ -28,7 +28,7 @@ def test_import():
 def test_server_creation():
     """Test that server can be created."""
     from mcp_pyrefly import create_server
-    
+
     server = create_server()
     assert server is not None
     # Server should be a FastMCP instance from the mcp package

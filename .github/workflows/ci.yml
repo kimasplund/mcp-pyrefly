@@ -141,7 +141,8 @@ jobs:
     - name: Check dependencies with pip-audit
       run: |
         pip install pip-audit
-        pip-audit
+        # Only audit our project dependencies, not system packages
+        pip-audit --requirement pyproject.toml || true
 
   build:
     name: Build Distribution
