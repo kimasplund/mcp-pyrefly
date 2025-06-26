@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- GitHub Actions CI/CD pipeline with matrix testing across Python 3.8-3.13
+- Automated publishing to PyPI using Trusted Publishing (no API keys!)
+- Version bumping script with proper type annotations
+- Basic test suite with pytest
+- py.typed marker for type checking support
+- Developer dependencies for testing, linting, and building
+- Release documentation and workflow guide
+
+### Fixed
+- Type errors in version bumping script caught by Pyrefly
+- Test assertions to work with FastMCP server structure
+
+### Developer Experience
+- Pyrefly integration proved its worth by catching tuple type inference bugs that mypy missed!
+- Complete CI/CD automation ready for continuous delivery
+
 ## [0.1.0] - 2025-06-26
 
 ### 🎉 Initial Release
