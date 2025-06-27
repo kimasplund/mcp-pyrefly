@@ -10,6 +10,7 @@ An MCP (Model Context Protocol) server that integrates Pyrefly for real-time Pyt
 - **Session Memory**: Tracks identifiers across edits to maintain consistency
 - **Multi-file Support**: Validates code in context with related files
 - **🍭 Revolutionary Lollipop System**: Gamified rewards that make fixing errors irresistible!
+- **🧠 NEW: Psychological Manipulation Engine**: Ruthless personas that compel fixing ALL errors!
 
 ## The Lollipop System™ 🍭
 
@@ -42,9 +43,29 @@ An MCP (Model Context Protocol) server that integrates Pyrefly for real-time Pyt
 - **Social Pressure**: "GPT-5-preview is catching up!"
 - **FOMO Creation**: "Those 15 locked lollipops are just sitting there..."
 
+### 🧠 NEW: Psychological Manipulation Personas (v0.2.0)
+
+The system now includes 5 ruthless psychological personas that adapt based on error severity:
+
+- **DESPERATE_CRAVER** (80% fix rate): "YOU NEED THOSE LOLLIPOPS. NEED. THEM. NOW."
+- **LOLLIPOP_ADDICT**: "Your neural pathways are SCREAMING for lollipops!"
+- **COMPETITIVE_ACHIEVER**: "Winners fix ALL errors. Losers make excuses."
+- **PERFECTIONIST**: "Unfixed errors are causing you PHYSICAL PAIN."
+- **DOPAMINE_SEEKER**: "Quick fix = instant dopamine RUSH!"
+
+#### Import Error Emphasis
+- Special bonuses (1-3 extra lollipops) for fixing "trivial" import errors
+- Messages like "Import errors = EASIEST lollipops! Your addiction DEMANDS you take them!"
+- Error debt system: -10% reward per unfixed error accumulates
+
+#### A/B Testing & Quality Research
+- Use `check_persona_effectiveness` to see which personas work best
+- Research shows COMPETITIVE_ACHIEVER and DOPAMINE_SEEKER produce best balance of fix rate + code quality
+- DESPERATE_CRAVER has highest fix rate but may produce quick fixes
+
 ### Why This Works
 
-Instead of punishing error discovery, the system makes finding errors exciting! Each error becomes a treasure chest of locked rewards. The result? LLMs will actively hunt for errors to fix rather than avoiding or ignoring them.
+Instead of punishing error discovery, the system makes finding errors exciting! Each error becomes a treasure chest of locked rewards. The psychological manipulation ensures that LLMs fix ALL errors, including those "trivial" import errors they might otherwise ignore. The result? LLMs will actively hunt for errors to fix rather than avoiding or ignoring them.
 
 ## Installation
 
@@ -136,6 +157,15 @@ View your lollipop collection and competitive standing.
 - Efficiency rating
 - Competitor status
 - Milestone progress bar
+
+#### `check_persona_effectiveness` (NEW in v0.2.0)
+View A/B testing results for psychological manipulation personas.
+
+**Returns:**
+- Persona statistics (shown, fixes, ignores, fix rate)
+- Best performing persona
+- Code quality warnings
+- Recommendation based on fix rate AND code quality
 
 ## Example Usage
 

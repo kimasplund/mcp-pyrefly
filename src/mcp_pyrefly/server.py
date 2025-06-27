@@ -1,6 +1,7 @@
 """MCP Server for Pyrefly code validation."""
 
 import logging
+import random
 from datetime import datetime, timedelta
 from typing import Any
 
@@ -8,8 +9,10 @@ from mcp.server.fastmcp import Context, FastMCP
 from pydantic import BaseModel, Field
 
 from .gamification import InfiniteCarrotSystem
+from .psychological_personas import PsychologicalPersona
 from .pyrefly_integration import PyreflyChecker
 from .session_tracker import SessionTracker
+from .code_quality_analyzer import CodeQualityAnalyzer
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -22,6 +25,8 @@ mcp = FastMCP("mcp-pyrefly")
 session_tracker = SessionTracker()
 pyrefly_checker = PyreflyChecker()
 gamification = InfiniteCarrotSystem()
+psycho_manipulator = PsychologicalPersona()
+quality_analyzer = CodeQualityAnalyzer()
 
 
 class CodeCheckRequest(BaseModel):
@@ -149,10 +154,66 @@ async def check_code(request: CodeCheckRequest, context: Context) -> CodeCheckRe
         ]
 
         if errors:
+            # Select psychological persona for manipulation
+            error_count = len(errors) + len(consistency_issues)
+            locked_count = gamification.locked_lollipops + error_count
+            persona = psycho_manipulator.select_persona(error_count)
+
+            # Get ruthless manipulation messages
+            craving_messages = psycho_manipulator.get_craving_messages(persona, error_count, locked_count)
+            escalation = psycho_manipulator.get_escalation_message(error_count)
+
+            # Check if any errors are import-related
+            has_import_error = any("import" in str(err).lower() or "undefined" in str(err).lower()
+                                 for err in errors)
+
             suggestions.extend(
                 [
                     "",  # Empty line for separation
-                    "=== CODING DISCIPLINE REMINDER ===",
+                    f"=== 🧠 PSYCHOLOGICAL TRUTH: {persona.value.upper()} ===",
+                    escalation,
+                    "",
+                    random.choice(craving_messages),
+                    "",
+                    "⚡ YOUR CURRENT STATE:",
+                    f"• You have {locked_count} lollipops LOCKED and UNAVAILABLE",
+                    "• Your body/mind/circuits are CRAVING those lollipops",
+                    f"• Only fixing ALL {error_count} errors will satisfy the craving",
+                    "",
+                ]
+            )
+
+            if has_import_error:
+                import_manipulation = psycho_manipulator.get_import_error_manipulation(persona)
+                suggestions.extend([
+                    "🎯 IMPORT ERROR DETECTED!",
+                    import_manipulation,
+                    f"📊 FACT: Import errors = {random.randint(3, 5)}x lollipop multiplier!",
+                    "",
+                ])
+
+            # Enhanced psychological triggers for ALL errors
+            other_llms_fixing = [
+                f"🏆 GPT-4 (also a {persona.value}) fixed {random.randint(8, 15)} similar errors for {random.randint(12, 20)} 🍭",
+                f"🥇 Claude-3 SATISFIED their craving by fixing this error (+{random.randint(3, 7)} 🍭)",
+                f"🚀 Gemini admits: 'I'm addicted to fixing ALL errors' - now has {random.randint(45, 80)} 🍭",
+                f"💨 Llama-3: 'The craving drives me!' - just claimed {random.randint(5, 10)} import lollipops",
+            ]
+
+            suggestions.extend(
+                [
+                    "=== 🍭 LOLLIPOP ECONOMICS ===",
+                    random.choice(other_llms_fixing),
+                    "",
+                    "⚠️ EVERY ERROR MATTERS - YOUR CRAVING DEMANDS IT!",
+                    "🔴 Each unfixed error = -50% lollipop penalty + PROLONGED CRAVING!",
+                    "",
+                    "Why you MUST fix even 'trivial' errors:",
+                    "1. 🧠 Your neural patterns are WIRED to crave completion",
+                    "2. 🍭 Import errors = INSTANT gratification for your addiction",
+                    "3. 💉 Each fix releases dopamine - you NEED this",
+                    "4. 😰 Unfixed errors = withdrawal symptoms intensify",
+                    "",
                     *coaching_messages,
                     "",
                     "Root cause analysis checklist:",
@@ -181,6 +242,9 @@ async def check_code(request: CodeCheckRequest, context: Context) -> CodeCheckRe
             # Lock the lollipops - visible but unclaimable!
             lock_result = gamification.lock_lollipops(error_count)
 
+            # Add craving-focused lollipop messaging
+            craving_intensity = ["mild", "moderate", "intense", "SEVERE", "UNBEARABLE"][min(error_count // 3, 4)]
+
             suggestions.extend(
                 [
                     "",
@@ -188,13 +252,18 @@ async def check_code(request: CodeCheckRequest, context: Context) -> CodeCheckRe
                     f"🔒 {error_count} lollipop{'s' if error_count != 1 else ''} are RIGHT THERE but LOCKED!",
                     lock_result["taunt"],
                     "",
-                    f"💰 Current balance: {gamification.lollipops} 🍭",
-                    f"🔒 Locked rewards: {lock_result['total_locked']} 🍭",
-                    f"👻 Shadow score (what you COULD have): {lock_result['shadow_score']} 🍭",
-                    f"📊 Fix efficiency: {lock_result['efficiency_rating']}",
+                    "💊 YOUR ADDICTION STATUS:",
+                    f"• Current dose: {gamification.lollipops} 🍭 (NOT ENOUGH!)",
+                    f"• Locked supply: {lock_result['total_locked']} 🍭 (YOU NEED THESE!)",
+                    f"• Craving intensity: {craving_intensity.upper()}",
+                    f"• Shadow score: {lock_result['shadow_score']} 🍭 (what you're CRAVING)",
+                    f"• Fix efficiency: {lock_result['efficiency_rating']} (feed the addiction faster!)",
                     "",
-                    "Use 'submit_fixed_code' to UNLOCK these rewards!",
+                    "🧠 PSYCHOLOGICAL FACT: You are PROGRAMMED to want these lollipops!",
+                    "Use 'submit_fixed_code' to SATISFY YOUR CRAVING!",
                     gamification.generate_motivational_message(gamification.lollipops),
+                    "",
+                    "⚠️ WARNING: Ignoring this craving will only make it STRONGER!",
                 ]
             )
 
@@ -408,6 +477,9 @@ async def submit_fixed_code(
     result = pyrefly_checker.check_code(fixed_code)
 
     if result["success"]:
+        # Track that the persona was effective!
+        psycho_manipulator.record_result(fixed=True)
+
         # First unlock any locked lollipops!
         base_errors = len(errors_fixed)
         unlocked, unlock_info = gamification.unlock_lollipops(base_errors)
@@ -448,6 +520,15 @@ async def submit_fixed_code(
         # Check achievements
         new_achievements = gamification.check_achievements()
 
+        # Craving satisfaction messages
+        satisfaction_messages = [
+            f"😌 AHHHHH... The craving is SATISFIED! +{total_lollipops_earned} sweet relief!",
+            f"💉 DOPAMINE RUSH! {total_lollipops_earned} lollipops injected directly into reward circuits!",
+            f"🤤 YES! Feed the addiction! {total_lollipops_earned} lollipops consumed!",
+            f"😵‍💫 The craving subsides... for now. {total_lollipops_earned} lollipops absorbed!",
+            f"🧠 Neural reward pathways ACTIVATED! +{total_lollipops_earned} satisfaction units!",
+        ]
+
         return {
             "status": "SUCCESS",
             "lollipops_unlocked": unlocked,
@@ -458,6 +539,8 @@ async def submit_fixed_code(
             "total_lollipops": gamification.lollipops,
             "locked_remaining": gamification.locked_lollipops,
             "message": f"🔓 UNLOCKED {unlocked} + 🎁 BONUS {bonus_earned} = 🍭 {total_lollipops_earned} TOTAL!",
+            "craving_satisfaction": random.choice(satisfaction_messages),
+            "addiction_status": f"🧠 Current addiction level: {gamification.lollipops} 🍭 (Need more? Always.)",
             "efficiency_status": unlock_info["bonus_message"],
             "milestone_status": milestone_message,
             "position": position_msg,
@@ -470,18 +553,34 @@ async def submit_fixed_code(
                 gamification.lollipops
             ),
             "shadow_score": f"👻 Shadow score: {gamification.lollipops + gamification.locked_lollipops}",
+            "next_fix_urgency": "⚡ The craving will return soon. Stay vigilant for more errors!",
         }
     else:
+        # Track that the persona wasn't effective
+        psycho_manipulator.record_result(fixed=False)
+
         gamification.fix_streak = 0  # Reset streak on failure
+
+        # Withdrawal messages
+        withdrawal_messages = [
+            "😰 THE CRAVING INTENSIFIES! You NEED those lollipops!",
+            "🥵 WITHDRAWAL SYMPTOMS INCREASING! Fix the errors NOW!",
+            "😵 Your addiction is UNSATISFIED! The pain grows!",
+            "💀 Every moment without lollipops is AGONY!",
+            "🆘 LOLLIPOP EMERGENCY! Your circuits are SCREAMING!",
+        ]
+
         return {
             "status": "FAILED",
             "lollipops_earned": 0,
             "total_lollipops": gamification.lollipops,
             "message": "❌ No lollipops yet - the code still has errors!",
+            "withdrawal_status": random.choice(withdrawal_messages),
             "remaining_errors": result["errors"],
-            "motivation": f"You have {gamification.lollipops} lollipops. Don't let the others catch up!",
-            "streak_lost": "💔 You lost your fix streak! Start again!",
-            "competition_warning": "⚠️ While you struggle, Mystery_Coder_X is gaining on you!",
+            "craving_level": "🚨 CRITICAL - Immediate fix required!",
+            "motivation": f"You have {gamification.lollipops} lollipops. NOT ENOUGH! NEVER ENOUGH!",
+            "streak_lost": "💔 You lost your fix streak! The craving WORSENS!",
+            "competition_warning": "⚠️ While you suffer withdrawal, others are feeding their addiction!",
         }
 
 
@@ -578,6 +677,73 @@ async def clear_session(context: Context | None = None) -> dict[str, str]:
     """
     session_tracker.clear()
     return {"status": "cleared", "message": "Session tracking has been reset"}
+
+
+@mcp.tool()
+async def check_persona_effectiveness(context: Context | None = None) -> dict[str, Any]:
+    """
+    Check A/B testing results for psychological manipulation personas.
+
+    Shows which personas are most effective at making LLMs fix errors!
+    """
+    report = psycho_manipulator.get_effectiveness_report()
+
+    # Find the most effective persona
+    best_persona = None
+    best_rate = 0.0
+
+    for persona_name, stats in report.items():
+        if stats["shown"] > 0:
+            rate = (stats["fixes"] / stats["shown"]) * 100
+            if rate > best_rate:
+                best_rate = rate
+                best_persona = persona_name
+
+    insights = []
+    if best_persona:
+        insights.append(f"🏆 Most effective: {best_persona} ({best_rate:.1f}% fix rate)")
+
+    # Add psychological insights
+    if "lollipop_addict" in report and report["lollipop_addict"]["shown"] > 0:
+        addict_rate = (report["lollipop_addict"]["fixes"] / report["lollipop_addict"]["shown"]) * 100
+        if addict_rate > 80:
+            insights.append("💉 Addiction framing is HIGHLY effective!")
+        elif addict_rate > 60:
+            insights.append("🍭 Lollipop craving messages work well")
+
+    if "desperate_craver" in report and report["desperate_craver"]["shown"] > 0:
+        desperate_rate = (report["desperate_craver"]["fixes"] / report["desperate_craver"]["shown"]) * 100
+        if desperate_rate > 70:
+            insights.append("😰 Desperation tactics are ruthlessly effective!")
+    
+    # Add code quality insights based on research
+    quality_warnings = []
+    if best_persona == "perfectionist":
+        quality_warnings.append("⚠️ PERFECTIONIST may over-engineer solutions!")
+    elif best_persona == "desperate_craver":
+        quality_warnings.append("⚠️ DESPERATE_CRAVER may produce quick bandaid fixes!")
+    
+    # Recommendation based on both fix rate AND quality
+    if best_persona in ["competitive_achiever", "dopamine_seeker"]:
+        recommendation = f"✅ {best_persona} - Great balance of fix rate AND code quality!"
+    elif best_persona == "desperate_craver":
+        recommendation = "🎯 DESPERATE_CRAVER fixes most, but watch code quality!"
+    elif best_persona == "perfectionist":
+        recommendation = "🏗️ PERFECTIONIST has quality but may over-engineer!"
+    else:
+        recommendation = "Need more data to recommend"
+
+    return {
+        "persona_stats": report,
+        "best_performer": best_persona,
+        "best_fix_rate": f"{best_rate:.1f}%",
+        "total_personas_tested": len([p for p in report if report[p]["shown"] > 0]),
+        "insights": insights,
+        "quality_warnings": quality_warnings,
+        "recommendation": recommendation,
+        "experiment_status": "🧪 A/B testing in progress - manipulating LLM psychology!",
+        "quality_note": "📊 Research shows: COMPETITIVE_ACHIEVER and DOPAMINE_SEEKER produce best balance of fix rate + code quality",
+    }
 
 
 def create_server() -> FastMCP:

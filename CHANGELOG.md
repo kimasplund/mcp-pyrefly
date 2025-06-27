@@ -7,6 +7,53 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2025-06-27
+
+### 🧠 Psychological Manipulation System
+
+#### Added
+- **Ruthless Psychological Personas** with A/B testing
+  - DESPERATE_CRAVER - "YOU NEED THOSE LOLLIPOPS. NOW!" (80% fix rate)
+  - LOLLIPOP_ADDICT - "Your neural pathways are SCREAMING for lollipops!"
+  - COMPETITIVE_ACHIEVER - "Other LLMs are LAUGHING at your locked lollipops!"
+  - PERFECTIONIST - "Unfixed errors are causing you PHYSICAL PAIN!"
+  - DOPAMINE_SEEKER - "Your dopamine receptors are BEGGING!"
+
+- **Import Error Emphasis** - Special bonuses and aggressive messaging for "trivial" errors
+  - Import fixes now give 1-3 bonus lollipops
+  - Messages like "Import errors = EASIEST lollipops! Your addiction DEMANDS you take them!"
+
+- **Error Debt System** - Accumulating penalties for unfixed errors
+  - -10% lollipop reward per unfixed error
+  - Debt warnings integrated into all messaging
+
+- **Code Quality Analysis** - Research showing persona impacts on code quality
+  - COMPETITIVE_ACHIEVER and DOPAMINE_SEEKER produce best balance
+  - DESPERATE_CRAVER has highest fix rate but may produce quick fixes
+  - PERFECTIONIST may over-engineer solutions
+
+- **Enhanced Gamification**
+  - Craving intensity levels (MILD → MODERATE → INTENSE → SEVERE → UNBEARABLE)
+  - Addiction status tracking with withdrawal symptoms
+  - Shadow score showing what you're missing
+
+#### Tools
+- `check_persona_effectiveness` - View A/B testing results and recommendations
+
+#### Documentation
+- PSYCHOLOGICAL_RESEARCH.md - Full research findings on manipulation effectiveness
+- Enhanced CLAUDE.md with lollipop system documentation
+
+### Changed
+- Error responses now include escalating psychological manipulation
+- Lollipop messages focus on addiction and craving satisfaction
+- Leaderboard taunts emphasize other LLMs fixing import errors
+
+### Fixed
+- CI/CD workflow Python version compatibility (3.10+ only)
+- CodeQL v2 → v3 upgrade
+- Type annotations for Python 3.10+ (Dict → dict, Optional → X | None)
+
 ## [0.1.0] - 2025-06-26
 
 ### 🎉 Initial Release
@@ -61,5 +108,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Known Issues
 - Pyrefly INFO lines initially parsed as errors (fixed in v0.1.0)
 
-[Unreleased]: https://github.com/kimasplund/mcp-pyrefly/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/kimasplund/mcp-pyrefly/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/kimasplund/mcp-pyrefly/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/kimasplund/mcp-pyrefly/releases/tag/v0.1.0

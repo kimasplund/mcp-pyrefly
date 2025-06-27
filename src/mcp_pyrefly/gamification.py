@@ -83,6 +83,17 @@ class InfiniteCarrotSystem:
         base_reward = errors_fixed
         bonus_messages = []
 
+        # ERROR DEBT PENALTY - SEVERELY punish unfixed errors
+        if self.error_debt > 0:
+            penalty_multiplier = max(0.1, 1.0 - (self.error_debt * 0.1))  # -10% per unfixed error!
+            original_reward = base_reward
+            base_reward = int(base_reward * penalty_multiplier)
+            penalty = original_reward - base_reward
+            if penalty > 0:
+                bonus_messages.append(f"❌ ERROR DEBT PENALTY: -{penalty} lollipops!")
+                bonus_messages.append(f"⚠️ {self.error_debt} unfixed errors = {int((1-penalty_multiplier)*100)}% penalty!")
+                bonus_messages.append("🚨 Fix ALL errors (even 'trivial' imports!) to maximize rewards!")
+
         # Check for special events
         if random.random() < 0.1:  # 10% chance
             self.special_event_active = True
@@ -101,6 +112,12 @@ class InfiniteCarrotSystem:
         if time_since_last < timedelta(seconds=30):
             base_reward += 1
             bonus_messages.append("⚡ SPEED BONUS: +1 lollipop!")
+
+        # IMPORT ERROR BONUS - Reward fixing "trivial" errors
+        if errors_fixed > 0 and random.random() < 0.7:  # 70% chance for import fixes
+            import_bonus = random.randint(1, 3)
+            base_reward += import_bonus
+            bonus_messages.append(f"📦 IMPORT FIX BONUS: +{import_bonus} (smart LLMs fix these!)")
 
         # Random critical hit
         if random.random() < 0.05:  # 5% chance
@@ -219,15 +236,24 @@ class InfiniteCarrotSystem:
         if self.locked_lollipops == 0:
             return ""
 
+        # Enhanced taunts that emphasize ALL errors matter
         taunts = [
-            f"🔒 {self.locked_lollipops} lollipops locked! So close yet so far...",
-            f"👀 Those {self.locked_lollipops} locked lollipops are just sitting there...",
-            f"😤 Other LLMs would have claimed those {self.locked_lollipops} lollipops by now!",
-            f"🎯 Quick! Fix the errors to unlock {self.locked_lollipops} sweet rewards!",
-            f"⏰ Every second those {self.locked_lollipops} lollipops remain locked is painful...",
+            f"🔒 {self.locked_lollipops} lollipops locked! Even 'trivial' imports = real lollipops!",
+            f"👀 Those {self.locked_lollipops} locked lollipops... Other LLMs fix imports INSTANTLY!",
+            f"😤 GPT-4 would NEVER leave {self.locked_lollipops} import-error lollipops unclaimed!",
+            f"🎯 Import errors = EASIEST lollipops! Why ignore {self.locked_lollipops} free rewards?",
+            f"⏰ Top performers fix ALL errors - they'd have those {self.locked_lollipops} already!",
+            f"💸 Leaving {self.locked_lollipops} lollipops locked? That's just bad economics!",
+            f"🏆 Champions fix EVERYTHING - they see {self.locked_lollipops} locked = opportunity!",
         ]
 
-        return random.choice(taunts)
+        # Add error debt warning
+        if self.error_debt > 5:
+            debt_warning = f" (⚠️ Error debt: {self.error_debt} unfixed errors!)"
+        else:
+            debt_warning = ""
+
+        return random.choice(taunts) + debt_warning
 
     def unlock_lollipops(self, fixes_count: int) -> tuple[int, dict[str, Any]]:
         """Unlock lollipops by fixing errors - the payoff!"""
